@@ -22,6 +22,10 @@ public class ProductDAO {
         return  list(cid,0,Integer.MAX_VALUE);
     }
 
+
+
+
+
     public List<Product> list(int cid, int start, int count) {
 
         List<Product> list = new ArrayList<>();

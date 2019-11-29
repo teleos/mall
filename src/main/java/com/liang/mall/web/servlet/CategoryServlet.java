@@ -19,7 +19,6 @@ public class CategoryServlet extends BaseBackServlet {
     @Override
     public String add(HttpServletRequest request, HttpServletResponse response, Page page) {
 
-
         DiskFileItemFactory factory = new DiskFileItemFactory();
         ServletFileUpload upload = new ServletFileUpload(factory);
         upload.setHeaderEncoding("utf-8");
@@ -46,6 +45,17 @@ public class CategoryServlet extends BaseBackServlet {
 
     @Override
     public String delete(HttpServletRequest request, HttpServletResponse response, Page page) {
+
+        int id = Integer.parseInt( request.getParameter("id"));
+        Category category = categoryDAO.get(id);
+        int i = categoryDAO.getTotal(id,"select count(*) from product where cid = ?");
+        int j = categoryDAO.getTotal(id,"select count(*) from property where cid = ?");
+
+        if(i+j > 0){
+            //todo
+        }
+
+
         return null;
     }
 
@@ -64,9 +74,38 @@ public class CategoryServlet extends BaseBackServlet {
     @Override
     public String update(HttpServletRequest request, HttpServletResponse response, Page page) {
 
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        ServletFileUpload upload = new ServletFileUpload(factory);
+        upload.setHeaderEncoding("utf-8");
+        List<FileItem> fileItems = null;
+        try {
+            fileItems = upload.parseRequest(request);
+
+            String name = fileItems.get(0).getString("utf-8");
+            String filepath = fileItems.get(1).getName();
+            String id = fileItems.get(2).getString("utf-8");
+
+            Category c = new Category();
+            c.setName(name);
+            c.setId(Integer.parseInt(id) );
+
+            Integer i = categoryDAO.update(c);
+            if (i>0) {
+
+                String realPath = getServletContext().getRealPath("/img/category/");
+                fileItems.get(1).write(new File(realPath+"/"+id+".jpg"));
+                return "@/mall/admin_category_list";
+            }
+        } catch (FileUploadException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
-        return null;
+        return "admin/editCategory.jsp";
     }
 
     @Override

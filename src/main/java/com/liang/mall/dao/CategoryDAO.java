@@ -9,9 +9,29 @@ import java.util.List;
 
 public class CategoryDAO {
 
+
+    public int getTotal(int cid,String sql){
+
+        int i = 0;
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1,cid);
+            try (ResultSet rs = stmt.executeQuery()) {
+                i = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return i;
+
+    }
+
+
+
     public int getTotal(){
         int total = 0;
-        try (Connection c = DBUtil.getConnection(); Statement s = c.createStatement();) {
+        try (Connection c = DBUtil.getConnection(); Statement s = c.createStatement()) {
 
             String sql = "select count(*) from Category";
 
@@ -46,26 +66,27 @@ public class CategoryDAO {
         return  bean;
     }
 
-    public void update(Category bean) {
-
+    public Integer update(Category bean) {
+        int i = 0;
         String sql = "update category set name= ? where id = ?";
-        try (Connection c = DBUtil.getConnection(); PreparedStatement ps = c.prepareStatement(sql);) {
+        try (Connection c = DBUtil.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setString(1, bean.getName());
             ps.setInt(2, bean.getId());
 
-            ps.execute();
+            i = ps.executeUpdate();
 
         } catch (SQLException e) {
 
             e.printStackTrace();
         }
 
+        return i;
     }
 
     public void delete(int id) {
 
-        try (Connection c = DBUtil.getConnection(); Statement s = c.createStatement();) {
+        try (Connection c = DBUtil.getConnection(); Statement s = c.createStatement()) {
 
             String sql = "delete from Category where id = " + id;
 
@@ -80,7 +101,7 @@ public class CategoryDAO {
     public Category get(int id) {
         Category bean = null;
 
-        try (Connection c = DBUtil.getConnection(); Statement s = c.createStatement();) {
+        try (Connection c = DBUtil.getConnection(); Statement s = c.createStatement()) {
 
             String sql = "select * from Category where id = " + id;
 
